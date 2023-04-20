@@ -150,6 +150,7 @@ public class CarLot {
 	public void saveInventory(ArrayList<Car> arrayList) throws SQLException {
 		establishConnection();
 		for (Car car : inventory) {
+			System.out.printf("Saving %s%n", car.getId());
 			try {
 				CarLotDatabase.addInventory(car);
 			} catch (SQLIntegrityConstraintViolationException e) {

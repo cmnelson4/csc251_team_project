@@ -1,5 +1,7 @@
 package csc251.team.project;
 
+import java.sql.SQLException;
+
 public class CarLotTester {
 	public static void main(String[] args) {
 		CarLot lot = new CarLot();
@@ -7,7 +9,7 @@ public class CarLotTester {
 		lot.addCar("test2", 10000, 10, 10000D, 10000D);
 		lot.addCar("test3", 12000, 20, 12000D, 12000D);
 		System.out.println("Inventory: ");
-		for (Car car: lot.getInventory()) {
+		for (Car car : lot.getInventory()) {
 			System.out.println(car);
 		}
 		System.out.println("Average MPG: " + lot.getAverageMpg());
@@ -16,6 +18,12 @@ public class CarLotTester {
 		System.out.println("Car with the highest mileage: " + lot.getCarWithHighestMileage());
 		lot.sellCar("test1", 17000.0D);
 		System.out.println("Total profit after selling one car: " + lot.getTotalProfit());
+		try {
+			lot.saveInventory(null);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		;
 	}
 
 }

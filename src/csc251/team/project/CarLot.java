@@ -2,28 +2,29 @@ package csc251.team.project;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.sql.*;
 
 public class CarLot {
 	private Car[] inventory;
 	private int numberOfCars = 0;
 	private int capacity = 0;
-	
-	public CarLot() { 
-		this(100); 
+
+	public CarLot() {
+		this(100);
 	}
-	
+
 	public CarLot(int capacity) {
 		this.capacity = capacity;
 		this.inventory = new Car[capacity];
 	}
-	
+
 	public void addCar(String id, int mileage, int mpg, double cost, double salesPrice) {
 		if (numberOfCars < capacity) {
 			this.inventory[numberOfCars] = new Car(id, mileage, mpg, cost, salesPrice);
 			numberOfCars++;
 		}
 	}
-	
+
 	public Car[] getInventory() {
 		Car[] allCars = new Car[numberOfCars];
 		for (int i = 0; i < numberOfCars; i++) {
@@ -31,7 +32,7 @@ public class CarLot {
 		}
 		return allCars;
 	}
-	
+
 	public Car findCarByIdentifier(String identifier) {
 		for (int x = 0; x < this.inventory.length; x++) {
 			Car aCar = this.inventory[x];
@@ -41,7 +42,7 @@ public class CarLot {
 		}
 		return null;
 	}
-	
+
 	public void sellCar(String identifier, double priceSold) throws IllegalArgumentException {
 		Car aCar = this.findCarByIdentifier(identifier);
 		if (aCar != null) {
@@ -50,9 +51,11 @@ public class CarLot {
 			throw new IllegalArgumentException("No car with identifier " + identifier);
 		}
 	}
-	
-	public Car[] getCarsInOrderOfEntry() { return this.inventory; }
-	
+
+	public Car[] getCarsInOrderOfEntry() {
+		return this.inventory;
+	}
+
 	public ArrayList<Car> getCarsSortedByMPG() {
 		ArrayList<Car> allCars = new ArrayList<>();
 		for (int i = 0; i < numberOfCars; i++) {
@@ -61,7 +64,7 @@ public class CarLot {
 		Collections.sort(allCars, (Car c1, Car c2) -> c2.compareMPG(c1));
 		return allCars;
 	}
-	
+
 	public Car getCarWithBestMPG() {
 		Car rtn = null;
 		int bestMpg = -1;
@@ -74,7 +77,7 @@ public class CarLot {
 		}
 		return rtn;
 	}
-	
+
 	public Car getCarWithHighestMileage() {
 		Car rtn = null;
 		int highestMileage = -1;
@@ -87,7 +90,7 @@ public class CarLot {
 		}
 		return rtn;
 	}
-	
+
 	public double getAverageMpg() {
 		double totalMpg = 0D;
 		for (int i = 0; i < numberOfCars; i++) {
@@ -96,14 +99,26 @@ public class CarLot {
 		}
 		return totalMpg / this.numberOfCars;
 	}
-	
+
 	public double getTotalProfit() {
 		double profit = 0D;
 		for (int i = 0; i < numberOfCars; i++) {
 			Car aCar = this.inventory[i];
-			profit += (aCar.isSold()?aCar.getProfit():0);
+			profit += (aCar.isSold() ? aCar.getProfit() : 0);
 		}
 		return profit;
 	}
-	
+
+	public void establishConnection() throws SQLException {
+		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project", "root", "root");
+	}
+
+	public void saveInventory(Car[] cars) throws SQLException {
+		establishConnection();
+		for (Car car : inventory) {
+			CarLotDatabase.addInventory(car);
+		}
+
+	}
+
 }

@@ -1,109 +1,113 @@
 package csc251.team.project;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.ListIterator;
 
 public class CarLot {
-	private Car[] inventory;
-	private int numberOfCars = 0;
-	private int capacity = 0;
-	
-	public CarLot() { 
-		this(100); 
+	// Inventory attribute
+	private ArrayList<Car> inventory = new ArrayList<>();
+
+	// Inventory accessor
+	public ArrayList<Car> getInventory() {
+		return this.inventory;
 	}
-	
-	public CarLot(int capacity) {
-		this.capacity = capacity;
-		this.inventory = new Car[capacity];
+
+	// Inventory mutator
+	public void setInventory(ArrayList<Car> inventory) {
+		this.inventory = inventory;
 	}
-	
-	public void addCar(String id, int mileage, int mpg, double cost, double salesPrice) {
-		if (numberOfCars < capacity) {
-			this.inventory[numberOfCars] = new Car(id, mileage, mpg, cost, salesPrice);
-			numberOfCars++;
-		}
-	}
-	
-	public Car[] getInventory() {
-		Car[] allCars = new Car[numberOfCars];
-		for (int i = 0; i < numberOfCars; i++) {
-			allCars[i] = this.inventory[i];
-		}
-		return allCars;
-	}
-	
+
+	// Find the car with the specified identifier in the inventory.
+
+	// Return an ArrayList of all Cars in the inventory.
+	// Find the car with the specified identifier in the inventory.
 	public Car findCarByIdentifier(String identifier) {
-		for (int x = 0; x < this.inventory.length; x++) {
-			Car aCar = this.inventory[x];
-			if (aCar.getId().equals(identifier)) {
-				return aCar;
+		Car foundCar = null;
+		Car c = null;
+		ListIterator it = this.inventory.listIterator();
+		while (it.hasNext()) {
+			c = (Car) it.next();
+			if (identifier.equalsIgnoreCase(c.getId())) {
+				foundCar = c;
+				break;
 			}
 		}
-		return null;
+		return c;
 	}
-	
-	public void sellCar(String identifier, double priceSold) throws IllegalArgumentException {
-		Car aCar = this.findCarByIdentifier(identifier);
-		if (aCar != null) {
-			aCar.sellCar(priceSold);
-		} else {
-			throw new IllegalArgumentException("No car with identifier " + identifier);
-		}
+	// Return an ArrayList of all Cars in the inventory.
+	public ArrayList<Car> getAllCars() {
+		ArrayList<Car> inventoryCopy = this.inventory;
+		return inventoryCopy;
 	}
-	
-	public Car[] getCarsInOrderOfEntry() { return this.inventory; }
-	
-	public ArrayList<Car> getCarsSortedByMPG() {
-		ArrayList<Car> allCars = new ArrayList<>();
-		for (int i = 0; i < numberOfCars; i++) {
-			allCars.add(this.inventory[i]);
-		}
-		Collections.sort(allCars, (Car c1, Car c2) -> c2.compareMPG(c1));
-		return allCars;
-	}
-	
-	public Car getCarWithBestMPG() {
-		Car rtn = null;
-		int bestMpg = -1;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			if (aCar.getMpg() > bestMpg) {
-				bestMpg = aCar.getMpg();
-				rtn = aCar;
+
+	// Return the Car in the inventory with the best MPG
+	public Car getCarWithBestMpg () {
+		int bestMpg = 0;
+		int indexOfBestMpg = 0;
+		for (int i = 0; i < this.inventory.size(); i++) {
+			if (this.inventory.get(i).getMpg() > bestMpg) {
+				bestMpg = this.inventory.get(i).getMpg();
+				indexOfBestMpg = i;
 			}
 		}
-		return rtn;
+		return this.inventory.get(indexOfBestMpg);
 	}
-	
-	public Car getCarWithHighestMileage() {
-		Car rtn = null;
-		int highestMileage = -1;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			if (aCar.getMileage() > highestMileage) {
-				highestMileage = aCar.getMileage();
-				rtn = aCar;
+
+	// Return the Car in the inventory with the highest mileage
+	public Car getCarWithHighestMileage () {
+		int highestMileage = 0;
+		int indexOfHighestMileage = 0;
+		for (int i = 0; i < this.inventory.size(); i++) {
+			if (this.inventory.get(i).getMileage() > highestMileage) {
+				highestMileage = this.inventory.get(i).getMileage();
+				indexOfHighestMileage = i;
 			}
 		}
-		return rtn;
+		return this.inventory.get(indexOfHighestMileage);
 	}
-	
+
+	// Return the average MPG of all Cars in the inventory
 	public double getAverageMpg() {
-		double totalMpg = 0D;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			totalMpg += aCar.getMpg();
+		double average = 0.0;
+		int sum = 0;
+		int size = this.inventory.size();
+
+		for (Car car : this.inventory) {
+			sum += car.getMpg();
 		}
-		return totalMpg / this.numberOfCars;
+
+		average = sum / (double) size;
+		return average;
 	}
-	
+
+	// Return the total profit of all cars in the inventory that have been sold
 	public double getTotalProfit() {
-		double profit = 0D;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			profit += (aCar.isSold()?aCar.getProfit():0);
+		double totalProfit = 0.0;
+
+		for (Car car : this.inventory) {
+			if (car.getIsSold()) {
+				double profit = (car.getSalePrice()) - (car.getCost());
+				totalProfit += profit;
+			}
 		}
-		return profit;
+		return totalProfit;
 	}
-	
+
+	// Add a new car with specified data
+	public void addCar(String id, int mileage, int mpg, double cost, double askingPrice) {
+		Car car = new Car(id, mileage, mpg, cost, askingPrice, 0.0, false);
+		this.inventory.add(car);
+	}
+
+	// Sell car, throw error if specified car doesn't exist
+	public void sellCar(String identifier, double salePrice) throws IllegalArgumentException {
+		for (int i = 0; i < this.inventory.size(); i++) {
+			if (identifier.equals(this.inventory.get(i).getId())) {
+				this.inventory.get(i).setIsSold(true);
+				this.inventory.get(i).setSalePrice(salePrice);
+				return;
+			}
+		}
+		throw new IllegalArgumentException("Car does not exist");
+	}
 }

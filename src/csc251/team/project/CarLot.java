@@ -3,121 +3,159 @@ package csc251.team.project;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.sql.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Scanner;
 
 public class CarLot {
-	private Car[] inventory;
-	private int numberOfCars = 0;
-	private int capacity = 0;
+	private ArrayList<Car> inventory = new ArrayList<>();
 
-	public CarLot() {
-		this(100);
+	public ArrayList<Car> getInventory() {
+		return inventory;
 	}
 
-	public CarLot(int capacity) {
-		this.capacity = capacity;
-		this.inventory = new Car[capacity];
+	public void setInventory(ArrayList<Car> inventory) {
+		this.inventory = inventory;
 	}
 
-	public void addCar(String id, int mileage, int mpg, double cost, double salesPrice) {
-		if (numberOfCars < capacity) {
-			this.inventory[numberOfCars] = new Car(id, mileage, mpg, cost, salesPrice);
-			numberOfCars++;
-		}
-	}
+	public Car findCarByIdentifier(String identifer) {
 
-	public Car[] getInventory() {
-		Car[] allCars = new Car[numberOfCars];
-		for (int i = 0; i < numberOfCars; i++) {
-			allCars[i] = this.inventory[i];
-		}
-		return allCars;
-	}
-
-	public Car findCarByIdentifier(String identifier) {
-		for (int x = 0; x < this.inventory.length; x++) {
-			Car aCar = this.inventory[x];
-			if (aCar.getId().equals(identifier)) {
-				return aCar;
-			}
+		for (int i = inventory.size() - 1; i >= 0; i--) {
+			if (((inventory.get(i)).getId()).equalsIgnoreCase(identifer))
+				return inventory.get(i);
 		}
 		return null;
+
 	}
 
-	public void sellCar(String identifier, double priceSold) throws IllegalArgumentException {
-		Car aCar = this.findCarByIdentifier(identifier);
-		if (aCar != null) {
-			aCar.sellCar(priceSold);
-		} else {
-			throw new IllegalArgumentException("No car with identifier " + identifier);
-		}
+	public ArrayList<Car> getCarsInOrderOfEntry() {
+		ArrayList<Car> inventoryCopy = new ArrayList<Car>();
+		inventoryCopy.addAll(this.inventory);
+		return inventoryCopy;
 	}
 
-	public Car[] getCarsInOrderOfEntry() {
-		return this.inventory;
-	}
-
+	// Return an ArrayList of all Cars in the inventory, sorted by MPG.
+	// This method should not sort the inventory, but should instead make
+	// a copy of the inventory and sort the copy
 	public ArrayList<Car> getCarsSortedByMPG() {
-		ArrayList<Car> allCars = new ArrayList<>();
-		for (int i = 0; i < numberOfCars; i++) {
-			allCars.add(this.inventory[i]);
-		}
-		Collections.sort(allCars, (Car c1, Car c2) -> c2.compareMPG(c1));
-		return allCars;
+		ArrayList<Car> inventoryCopy = new ArrayList<Car>();
+		inventoryCopy.addAll(this.inventory);
+		Collections.sort(inventoryCopy, new Comparator<Car>() {
+			@Override
+			public int compare(Car car1, Car car2) {
+				return Integer.valueOf(car2.getMpg()).compareTo(car1.getMpg());
+			}
+		});
+		return inventoryCopy;
 	}
 
+	// Return the Car in the inventory with the highest MPG
 	public Car getCarWithBestMPG() {
-		Car rtn = null;
-		int bestMpg = -1;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			if (aCar.getMpg() > bestMpg) {
-				bestMpg = aCar.getMpg();
-				rtn = aCar;
+		Car carMaxMpg = inventory.get(0);
+		for (int i = inventory.size() - 1; i > 0; i--) {
+			if (carMaxMpg.getMpg() < inventory.get(i).getMpg()) {
+				carMaxMpg = inventory.get(i);
 			}
 		}
-		return rtn;
+		return carMaxMpg;
 	}
 
+	// Return the Car in the inventory with the highest mileage
 	public Car getCarWithHighestMileage() {
-		Car rtn = null;
-		int highestMileage = -1;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			if (aCar.getMileage() > highestMileage) {
-				highestMileage = aCar.getMileage();
-				rtn = aCar;
+		Car carHighestMil = inventory.get(0);
+		for (int i = inventory.size() - 1; i > 0; i--) {
+			if (carHighestMil.getMileage() < inventory.get(i).getMileage()) {
+				carHighestMil = inventory.get(i);
 			}
 		}
-		return rtn;
+		return carHighestMil;
 	}
 
+	// Return the average MPG of all Cars in the inventory
 	public double getAverageMpg() {
-		double totalMpg = 0D;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			totalMpg += aCar.getMpg();
+		double sum = 0;
+		for (int i = inventory.size() - 1; i >= 0; i--) {
+			sum += inventory.get(i).getMpg();
 		}
-		return totalMpg / this.numberOfCars;
+		return sum / inventory.size();
 	}
 
+	// Return the total profit of all cars in the inventory that have been sold
 	public double getTotalProfit() {
-		double profit = 0D;
-		for (int i = 0; i < numberOfCars; i++) {
-			Car aCar = this.inventory[i];
-			profit += (aCar.isSold() ? aCar.getProfit() : 0);
+		double totalProfit = 0;
+		for (int i = inventory.size() - 1; i >= 0; i--) {
+			if (inventory.get(i).isSold()) {
+				totalProfit += inventory.get(i).getProfit();
+			}
 		}
-		return profit;
+		return totalProfit;
+	}
+
+	// This is method to show all cars that has been sold.
+	public ArrayList<Car> showSoldCars() {
+		ArrayList<Car> soldCars = new ArrayList<Car>();
+		for (int i = inventory.size() - 1; i >= 0; i--) {
+			if (inventory.get(i).isSold()) {
+				soldCars.add(inventory.get(i));
+			}
+		}
+		return soldCars;
+	}
+
+	// mutators
+	public void addCar(String id, int mileage, int mpg, double cost, double salesPrice) {
+		inventory.add(new Car(id, mileage, mpg, cost, salesPrice));
+	}
+
+	public void sellCar(String identifier, double priceSold) throws IllegalArgumentException, NullPointerException {
+		this.findCarByIdentifier(identifier).sellCar(priceSold);
+
+	}
+
+	// saveToDisk() method
+	public void saveToDisk() throws IOException {
+		FileWriter writer = new FileWriter("carlot.txt");
+		String str = "";
+		for (int i = 0; i < inventory.size(); i++) {
+			str += (inventory.get(i).getId() + ":" + inventory.get(i).getMileage() + ":" + inventory.get(i).getMpg()
+					+ ":"
+					+ inventory.get(i).getCost() + ":" + inventory.get(i).getSalesPrice() + "\n");
+		}
+		writer.write(str);
+		writer.close();
+	}
+
+	// loadFromDisk() method
+	public void loadFromDisk() throws FileNotFoundException {
+		File file = new File("carlot.txt");
+		Scanner scan = new Scanner(file);
+		while (scan.hasNext()) {
+			String str = scan.nextLine();
+			String[] array = str.split(":");
+			this.addCar(array[0], Integer.parseInt(array[1]), Integer.parseInt(array[2]), Double.parseDouble(array[3]),
+					Double.parseDouble(array[4]));
+		}
+		scan.close();
 	}
 
 	public void establishConnection() throws SQLException {
 		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project", "root", "test");
 	}
 
-	public void saveInventory(Car[] cars) throws SQLException {
+	public void saveInventory(ArrayList<Car> arrayList) throws SQLException {
 		establishConnection();
 		for (Car car : inventory) {
-			System.out.printf("Saving", car.getId());
-			CarLotDatabase.addInventory(car);
+			try {
+				CarLotDatabase.addInventory(car);
+			} catch (SQLIntegrityConstraintViolationException e) {
+				CarLotDatabase.updateInventory(car);
+			}
+
 		}
 
 	}

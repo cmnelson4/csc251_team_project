@@ -19,7 +19,7 @@ public class CarLotTester {
 		lot.sellCar("test1", 17000.0D);
 		System.out.println("Total profit after selling one car: " + lot.getTotalProfit());
 		try {
-			lot.saveInventory(null);
+			lot.saveInventory(lot.getInventory());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

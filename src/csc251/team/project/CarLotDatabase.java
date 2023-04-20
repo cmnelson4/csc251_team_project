@@ -7,7 +7,7 @@ public class CarLotDatabase {
 
     public CarLotDatabase(String url, String username, String password) throws SQLException {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -16,12 +16,15 @@ public class CarLotDatabase {
 
     public static void addInventory(Car car) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO car_inventory (id, mileage, mpg, cost, sales_price) VALUES (?, ?, ?, ?, ?);");
+                "INSERT INTO cars (id, mileage, mpg, cost, salesPrice, sold, priceSold, Profit) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
         statement.setString(1, car.getId());
         statement.setInt(2, car.getMileage());
         statement.setInt(3, car.getMpg());
         statement.setDouble(4, car.getCost());
         statement.setDouble(5, car.getSalesPrice());
+        statement.setBoolean(6, car.isSold());
+        statement.setDouble(7, car.getPriceSold());
+        statement.setDouble(8, car.getProfit());
         statement.executeUpdate();
     }
 }

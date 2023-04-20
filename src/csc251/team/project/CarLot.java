@@ -110,12 +110,13 @@ public class CarLot {
 	}
 
 	public void establishConnection() throws SQLException {
-		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project", "root", "root");
+		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project", "root", "test");
 	}
 
 	public void saveInventory(Car[] cars) throws SQLException {
 		establishConnection();
 		for (Car car : inventory) {
+			System.out.printf("Saving", car.getId());
 			CarLotDatabase.addInventory(car);
 		}
 

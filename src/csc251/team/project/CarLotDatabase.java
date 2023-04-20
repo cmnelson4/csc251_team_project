@@ -15,7 +15,6 @@ public class CarLotDatabase {
     }
 
     public static void addInventory(Car car) throws SQLException {
-        System.out.printf("Saving", car.getId());
         PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO cars (id, mileage, mpg, cost, salesPrice, sold, priceSold, profit) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
         statement.setString(1, car.getId());
@@ -30,7 +29,6 @@ public class CarLotDatabase {
     }
 
     public static void updateInventory(Car car) throws SQLException {
-        System.out.printf("Updating", car.getId());
         PreparedStatement statement = connection.prepareStatement(
                 "UPDATE cars set mileage = ?, mpg = ?, cost = ?, salesPrice = ?, sold = ?, priceSold = ?, profit = ? where id = ?;");
         statement.setInt(1, car.getMileage());

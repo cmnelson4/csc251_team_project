@@ -5,7 +5,7 @@ import java.sql.*;
 public class CarLotDatabase {
     private static Connection conn;
 
-    public CarLotDatabase(String url, String username, String password) throws SQLException {
+    public CarLotDatabase(String url) throws SQLException {
         // Initialize driver
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -14,7 +14,7 @@ public class CarLotDatabase {
         }
 
         // Make DB Connection
-        CarLotDatabase.conn = DriverManager.getConnection(url, username, password);
+        CarLotDatabase.conn = DriverManager.getConnection(url);
 
         // Determine if cars table exists and create it if it doesnt
         DatabaseMetaData md = conn.getMetaData();

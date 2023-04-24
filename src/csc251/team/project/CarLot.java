@@ -144,7 +144,7 @@ public class CarLot {
 	}
 
 	public void establishConnection() throws SQLException {
-		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project");
+		new CarLotDatabase("jdbc:mysql://localhost:3306/csc251_project", "root", "test");
 	}
 
 	public void saveInventory(ArrayList<Car> arrayList) throws SQLException {
